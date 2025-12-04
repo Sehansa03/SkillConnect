@@ -9,6 +9,7 @@ import SkillSearch from './Pages/SkillSearch/Components/SkillSearch.jsx';
 import SkillRequest from './Pages/SkillRequest.jsx';
 import Community from './Pages/Community.jsx';
 import MessagePage from './Pages/Message/MessagePage.jsx';
+import Profile from './Pages/Profile/Profile.jsx';
 import FloatingChatButton from './components/FloatingChatButton.jsx';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/skill-request" element={<SkillRequest />} />
         <Route path="/community" element={<Community />} />
         <Route path="/chat" element={<MessagePage />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <FloatingChatButton />
     </Router>
