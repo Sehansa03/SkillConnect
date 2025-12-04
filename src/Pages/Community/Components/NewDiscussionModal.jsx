@@ -15,7 +15,7 @@ export default function NewDiscussionModal({ allTags, form, setForm, onClose, on
       <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-lg border-2 border-purple-200">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-900">New Discussion</h2>
-          <button onClick={onClose} className="text-purple-600 hover:text-purple-800 font-medium transition-colors">Close</button>
+          {/* <button onClick={onClose} className="text-purple-600 hover:text-purple-800 font-medium transition-colors">Close</button> */}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
