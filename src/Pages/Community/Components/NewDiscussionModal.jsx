@@ -12,10 +12,10 @@ export default function NewDiscussionModal({ allTags, form, setForm, onClose, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-lg">
+      <div className="bg-white rounded-lg max-w-2xl w-full p-6 shadow-lg border-2 border-purple-200">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">New Discussion</h2>
-          <button onClick={onClose} className="text-gray-500">Close</button>
+          <h2 className="text-lg font-semibold text-slate-900">New Discussion</h2>
+          <button onClick={onClose} className="text-purple-600 hover:text-purple-800 font-medium transition-colors">Close</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,8 +60,8 @@ export default function NewDiscussionModal({ allTags, form, setForm, onClose, on
           </div>
 
           <div className="flex items-center justify-end gap-3">
-            <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded">Create</button>
+            <button type="button" onClick={onClose} className="px-4 py-2 border-2 border-purple-300 text-purple-700 rounded hover:bg-purple-50 transition-colors font-medium">Cancel</button>
+            <button type="submit" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors font-medium">Create</button>
           </div>
         </form>
       </div>
