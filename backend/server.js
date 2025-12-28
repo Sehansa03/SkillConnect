@@ -10,6 +10,9 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const requestRoutes = require("./routes/requestRoutes");
+const applyToHelproutes = require("./routes/applyToHelpRoutes");
+
 
 const app = express();
 const server = http.createServer(app);
@@ -31,6 +34,9 @@ app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", conversationRoutes);
 app.use("/api", messageRoutes);
+app.use("/api", requestRoutes);
+app.use("/api", applyToHelproutes);
+
 
 // ENVIRONMENT VARIABLES
 const PORT = process.env.PORT || 5000;
