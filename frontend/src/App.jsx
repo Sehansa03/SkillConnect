@@ -11,8 +11,11 @@ import Profile from './Pages/Profile/Profile.jsx';
 import Signup from './Pages/Signup/CreateAccountForm.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import Profileown from "./Pages/Profile/ProfileOwnerView.jsx";
+import { useActivityTracker } from './useActivityTracker';
 
 function App() {
+    // Track user activity
+    useActivityTracker();
 
     return (
         <Router>

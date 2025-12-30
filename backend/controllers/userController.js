@@ -139,3 +139,56 @@ exports.getPopularMembers = async (req, res) => {
     res.json({ success: false, message: "Server error" });
   }
 };
+
+// Get active members based on recent activity
+exports.getActiveMembers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const timeThreshold = req.query.minutes || 30; // Default: active in last 30 minutes
+
+    const thresholdDate = new Date(Date.now() - timeThreshold * 60 * 1000);
+
+    const users = await User.find({
+      lastActive: { $gte: thresholdDate }
+    })
+      .select("firstName lastName username profileImage lastActive isOnline")
+      .sort({ lastActive: -1 })
+      .limit(limit);
+
+    res.json({ success: true, users });
+  } catch (error) {
+    console.error("Get Active Members Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
+
+// Update user's last active time
+exports.updateActivity = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { isOnline } = req.body;
+
+    const updateData = {
+      lastActive: Date.now(),
+    };
+
+    if (isOnline !== undefined) {
+      updateData.isOnline = isOnline;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true }
+    ).select("firstName lastName lastActive isOnline");
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    console.error("Update Activity Error:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
