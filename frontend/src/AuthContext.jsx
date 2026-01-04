@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext({
   isAuthenticated: false,
   user: null,
+  loading: true,
   login: () => {},
   logout: () => {},
   updateUser: () => {},
@@ -11,6 +13,7 @@ const AuthContext = createContext({
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -24,6 +27,8 @@ export function AuthProvider({ children }) {
       // ignore corrupted storage
       setIsAuthenticated(false);
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -38,8 +43,12 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("skillconnect_current_gpa");
+    localStorage.removeItem("skillconnect_gpa_last_calculated");
     setIsAuthenticated(false);
     setUser(null);
+    // Navigation will be handled by the components using useEffect
   };
 
   const updateUser = (userData) => {
@@ -49,7 +58,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

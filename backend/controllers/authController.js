@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.createAccount = async (req, res) => {
   try {
-    const { firstName, lastName, email, username, role, department, password } = req.body;
+    const { firstName, lastName, email, username, role, department, university, course, specialization, password } = req.body;
 
     const existingEmail = await User.findOne({ email });
     if (existingEmail) return res.json({ success: false, message: "Email already exists" });
@@ -25,6 +25,9 @@ exports.createAccount = async (req, res) => {
       username,
       role,
       department,
+      university: university || "",
+      course: course || "",
+      specialization: specialization || "",
       password: hashedPassword,
     });
 
@@ -71,6 +74,9 @@ exports.login = async (req, res) => {
         username: user.username,
         role: user.role,
         department: user.department,
+        university: user.university,
+        course: user.course,
+        specialization: user.specialization,
         skills: user.skills || [],
         profileImage: user.profileImage,
         about: user.about,

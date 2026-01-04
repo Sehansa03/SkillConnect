@@ -1,16 +1,20 @@
 import { useAuth } from "../../AuthContext"
-import { Navigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import NavBar from "../../components/NavBar"
 import PopularMembers from "../Home/components/PopularMembers"
 import ActiveMembers from "../Home/components/ActiveMembers"
 import SkillRequests from "../Home/components/SkillRequests"
 import Footer from "../../components/Footer"
+import GPACalculator from "../../components/GPACalculator"
+import Leaderboard from "../../components/Leaderboard"
 
 export default function Dashboard() {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, loading } = useAuth();
+    const navigate = useNavigate();
     const [lastGpaCalculation, setLastGpaCalculation] = useState(null);
     const [currentGpa, setCurrentGpa] = useState(null);
+    const [showGPAModal, setShowGPAModal] = useState(false);
 
     useEffect(() => {
         // Load GPA data from localStorage
@@ -24,9 +28,36 @@ export default function Dashboard() {
         }
     }, []);
 
-    // Redirect to home if not authenticated
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
+    // Reload GPA data when modal closes
+    useEffect(() => {
+        if (!showGPAModal) {
+            try {
+                const storedGpa = localStorage.getItem('skillconnect_current_gpa');
+                const lastCalcDate = localStorage.getItem('skillconnect_gpa_last_calculated');
+                if (storedGpa) setCurrentGpa(storedGpa);
+                if (lastCalcDate) setLastGpaCalculation(new Date(lastCalcDate));
+            } catch (e) {
+                console.error('Error loading GPA data:', e);
+            }
+        }
+    }, [showGPAModal]);
+
+    // Redirect to home if not authenticated or when user logs out
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            navigate("/", { replace: true });
+        }
+    }, [isAuthenticated, navigate, loading]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-linear-to-br from-[#F3E8FF] to-white w-full flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-6xl mb-4">⏳</div>
+                    <p className="text-gray-600 text-lg">Loading...</p>
+                </div>
+            </div>
+        );
     }
 
     const getDaysSinceCalculation = () => {
@@ -47,7 +78,7 @@ export default function Dashboard() {
             {/* Dashboard Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24">
                 {/* Welcome Section */}
-                <div className="mb-8">
+                <div className="mb-8 bg-white rounded-2xl shadow-lg p-8 border border-purple-100">
                     <h1 className="text-5xl font-bold bg-linear-to-r from-[#7D4DF4] to-[#A589FD] bg-clip-text text-transparent mb-3">
                         Welcome back, {user?.name || user?.firstName || 'Friend'}! 👋
                     </h1>
@@ -97,7 +128,7 @@ export default function Dashboard() {
                                     )}
                                     
                                     <button 
-                                        onClick={() => {/* Open calculator */}}
+                                        onClick={() => setShowGPAModal(true)}
                                         className="w-full py-3 bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
                                     >
                                         {shouldRecalculate ? 'Recalculate GPA' : 'Update GPA'}
@@ -108,7 +139,7 @@ export default function Dashboard() {
                                     <div className="text-6xl mb-4">🎯</div>
                                     <p className="text-gray-600 mb-4">You haven't calculated your GPA yet</p>
                                     <button 
-                                        onClick={() => {/* Open calculator */}}
+                                        onClick={() => setShowGPAModal(true)}
                                         className="px-8 py-3 bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
                                     >
                                         Calculate Your GPA
@@ -135,6 +166,15 @@ export default function Dashboard() {
                                 <SkillRequests />
                             </div>
                         </div>
+
+                        {/* GPA Leaderboard */}
+                        <div className="bg-white rounded-2xl shadow-lg p-6 border border-purple-100 hover:shadow-xl transition-shadow">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="text-3xl">🏆</div>
+                                <h2 className="text-xl font-bold text-gray-800">GPA Leaderboard</h2>
+                            </div>
+                            <Leaderboard />
+                        </div>
                     </div>
 
                     {/* Right Column - Active Members (1 column) */}
@@ -151,6 +191,21 @@ export default function Dashboard() {
             </div>
 
             <Footer />
+
+            {/* GPA Calculator Modal */}
+            {showGPAModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+                    <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+                        <button
+                            onClick={() => setShowGPAModal(false)}
+                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold z-10"
+                        >
+                            ×
+                        </button>
+                        <GPACalculator />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

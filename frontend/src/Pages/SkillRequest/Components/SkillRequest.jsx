@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../../../components/NavBar";
 import CreateRequestButton from "./CreateRequestButton";
 import RequestCard from "./RequestCard";
@@ -7,10 +7,11 @@ import { useAuth } from "../../../AuthContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function SkillRequests() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const [myRequests, setMyRequests] = useState([]);
   const [otherRequests, setOtherRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: "All Categories",
     priority: "All Urgencies",
@@ -19,17 +20,19 @@ export default function SkillRequests() {
   const [showMyRequests, setShowMyRequests] = useState(true);
   const [showOtherRequests, setShowOtherRequests] = useState(true);
 
-  // Redirect to home if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  // Redirect to home if not authenticated or when user logs out
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate, loading]);
 
   useEffect(() => {
     fetchRequests();
   }, [filters, user]);
 
   const fetchRequests = async () => {
-    setLoading(true);
+    setRequestsLoading(true);
     try {
       const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       // Fetch my requests
@@ -59,9 +62,17 @@ export default function SkillRequests() {
     } catch (error) {
       console.error("Error fetching skill requests:", error);
     } finally {
-      setLoading(false);
+      setRequestsLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));

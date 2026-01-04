@@ -47,6 +47,8 @@ const UserSchema = new mongoose.Schema(
         headline: { type: String, default: "" },
         pronouns: { type: String, default: "" },
         university: { type: String, default: "" },
+        course: { type: String, default: "" },
+        specialization: { type: String, default: "" },
         about: { type: String, default: "" },
 
         skills: { type: [skillSchema], default: [] },

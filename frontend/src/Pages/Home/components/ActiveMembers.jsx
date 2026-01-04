@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
 
 export default function ActiveMembers() {
   const [activeMembers, setActiveMembers] = useState([]);
@@ -85,6 +86,14 @@ export default function ActiveMembers() {
                   {getTimeAgo(m.lastActive)}
                 </p>
               </div>
+
+              <button
+                onClick={(e) => handleMessage(m._id, e)}
+                className="p-2 rounded-lg bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors"
+                title="Message"
+              >
+                <MessageCircle size={16} />
+              </button>
             </div>
           ))}
         </div>

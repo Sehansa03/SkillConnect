@@ -225,7 +225,7 @@ export default function GPACalculator() {
                 Want to see the leaderboard?
               </p>
               <button
-                onClick={saveGPA}
+                onClick={() => openAuthModal('signin')}
                 className="w-full sm:w-auto mx-auto block px-8 py-3 bg-green-600 text-white text-base rounded-lg font-semibold hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Login to Save GPA

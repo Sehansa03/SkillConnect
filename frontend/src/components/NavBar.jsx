@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext.jsx";
 import { useModal } from "../ModalContext.jsx";
 import { useFeatureDialog } from "../FeatureDialogContext.jsx";
@@ -8,12 +8,20 @@ import { useFeatureDialog } from "../FeatureDialogContext.jsx";
 export default function NavBar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [visible, setVisible] = useState(true);
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
   const { isAuthenticated, user, logout } = useAuth();
   const { openAuthModal } = useModal();
   const { openFeatureDialog } = useFeatureDialog();
+
+  const isActiveLink = (link) => {
+    if (link.label === "Home") {
+      return location.pathname === "/" || location.pathname === "/dashboard";
+    }
+    return location.pathname === link.to;
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,10 +107,17 @@ export default function NavBar() {
             key={l.label}
             to={l.to}
             onClick={(e) => handleLinkClick(l, e)}
-            className="text-white hover:text-[#A589FD] transition"
+            className={`transition relative ${
+              isActiveLink(l)
+                ? 'text-white font-bold'
+                : 'text-white/80 hover:text-white'
+            }`}
             style={{ color: '#fff' }}
           >
             {l.label}
+            {isActiveLink(l) && (
+              <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-white rounded-full"></span>
+            )}
           </Link>
         ))}
       </div>
@@ -202,7 +217,11 @@ export default function NavBar() {
               </>
             ) : (
               <button
-                onClick={() => { setOpen(false); logout(); }}
+                onClick={() => { 
+                  setOpen(false); 
+                  logout(); 
+                  navigate("/");
+                }}
                 className="w-full px-4 py-2 rounded-xl font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 transition"
               >
                 Logout

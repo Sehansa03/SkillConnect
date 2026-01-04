@@ -17,6 +17,7 @@ const postRoutes = require("./routes/postRoutes");
 const discussionRoutes = require("./routes/discussionRoutes");
 const skillRequestRoutes = require("./routes/skillRequestRoutes");
 const searchRoutes = require("./routes/searchRoutes");
+const leaderboardRoutes = require("./routes/leaderboardRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -61,6 +62,7 @@ app.use("/api/posts", postRoutes);
 app.use("/api", discussionRoutes);
 app.use("/api", skillRequestRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 // Env
 const PORT = process.env.PORT || 5000;

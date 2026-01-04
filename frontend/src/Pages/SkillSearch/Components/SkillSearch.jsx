@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import Filters from "./Filters";
 import ProfileCard from "./ProfileCard";
@@ -7,9 +7,10 @@ import NavBar from "../../../components/NavBar";
 import { useAuth } from "../../../AuthContext";
 
 export default function SkillSearch() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [filters, setFilters] = useState({
     query: "",
     category: "",
@@ -19,13 +20,19 @@ export default function SkillSearch() {
     verifiedOnly: false,
   });
 
-  // Redirect to home if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  // Redirect to home if not authenticated or when user logs out
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate, loading]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [filters]);
 
   const fetchUsers = async () => {
-    setLoading(true);
+    setSearchLoading(true);
     try {
       const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
       const params = new URLSearchParams();
@@ -47,13 +54,17 @@ export default function SkillSearch() {
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, [filters]);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   const handleSearch = (searchQuery) => {
     setFilters({ ...filters, query: searchQuery });

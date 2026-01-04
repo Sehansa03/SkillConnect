@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../../components/NavBar.jsx";
 import SkillsOnboardingModal from "../../components/SkillsOnboardingModal.jsx";
+import { useAuth } from "../../AuthContext";
 import axios from "axios";
 import {
   PenTool,
@@ -14,6 +16,8 @@ import {
 } from "lucide-react"
 
 export default function ProfileOwnerView() {
+  const { isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
   
@@ -39,6 +43,8 @@ export default function ProfileOwnerView() {
     pronouns: "",
     position: "",
     university: "",
+    course: "",
+    specialization: "",
     description: "",
     skills: [],
   });
@@ -61,6 +67,8 @@ export default function ProfileOwnerView() {
         pronouns: editFormData.pronouns,
         headline: editFormData.position,
         university: editFormData.university,
+        course: editFormData.course,
+        specialization: editFormData.specialization,
         about: editFormData.description,
         skills: editFormData.skills,
         profileImage: editFormData.profileImage,
@@ -102,6 +110,14 @@ export default function ProfileOwnerView() {
     }
   };
 
+  // Add useEffect to fetch data on mount
+  useEffect(() => {
+    if (userId) {
+      fetchUserDiscussions();
+    }
+  }, [userId]);
+
+  // Fetch profile data on mount
   useEffect(() => {
     if (!userId || !token) return;
 
@@ -115,6 +131,8 @@ export default function ProfileOwnerView() {
           pronouns: user.pronouns || "",
           position: user.headline || `${user.role} | ${user.department}`,
           university: user.university || "",
+          course: user.course || "",
+          specialization: user.specialization || "",
           description: user.about || "",
           skills: user.skills || [],
         });
@@ -126,6 +144,8 @@ export default function ProfileOwnerView() {
           pronouns: user.pronouns || "",
           position: user.headline || `${user.role} | ${user.department}`,
           university: user.university || "",
+          course: user.course || "",
+          specialization: user.specialization || "",
           description: user.about || "",
           skills: user.skills || [],
         });
@@ -133,13 +153,26 @@ export default function ProfileOwnerView() {
       .catch(err => {
         console.error("Profile load error:", err);
       });
-
-    fetchUserDiscussions();
   }, [userId, token]);
+
+  // Redirect to home if not authenticated or when user logs out
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate, loading]);
 
   const avgRating = profileData.skills?.length > 0
     ? (profileData.skills.reduce((sum, s) => sum + (s.rating || 0), 0) / profileData.skills.length).toFixed(1)
     : "N/A";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-white font-sans text-gray-900">
@@ -207,6 +240,12 @@ export default function ProfileOwnerView() {
                     </span>
                   </div>
                   <p className="text-base text-gray-900 font-medium mb-1">{profileData.position}</p>
+                  {profileData.course && (
+                    <p className="text-sm text-gray-700 font-medium mb-1">
+                      📚 {profileData.course}
+                      {profileData.specialization && <span className="text-gray-500"> • {profileData.specialization}</span>}
+                    </p>
+                  )}
                   <p className="text-sm text-gray-500 font-medium">{profileData.university}</p>
                 </div>
 
@@ -406,6 +445,30 @@ export default function ProfileOwnerView() {
                     value={editFormData.university}
                     onChange={(e) => setEditFormData({ ...editFormData, university: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7D4DF4] focus:border-transparent"
+                  />
+                </div>
+
+                {/* Course */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Course</label>
+                  <input
+                    type="text"
+                    value={editFormData.course}
+                    onChange={(e) => setEditFormData({ ...editFormData, course: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7D4DF4] focus:border-transparent"
+                    placeholder="e.g., Computer Science, Business Administration"
+                  />
+                </div>
+
+                {/* Specialization */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Specialization</label>
+                  <input
+                    type="text"
+                    value={editFormData.specialization}
+                    onChange={(e) => setEditFormData({ ...editFormData, specialization: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#7D4DF4] focus:border-transparent"
+                    placeholder="e.g., Web Development, Machine Learning"
                   />
                 </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../AuthContext";
+import { MessageCircle } from "lucide-react";
 
 export default function PopularMembers() {
   const [members, setMembers] = useState([]);
@@ -24,6 +25,11 @@ export default function PopularMembers() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleMessage = (userId, e) => {
+    e.stopPropagation();
+    navigate(`/messages?userId=${userId}`);
   };
 
   const handleEndorse = async (userId, e) => {
@@ -84,7 +90,7 @@ export default function PopularMembers() {
           {members.map((m) => (
             <div
               key={m._id}
-              className="flex items-center gap-3 p-3 rounded-xl border border-purple-100 hover:border-purple-300 hover:bg-purple-50/30 transition cursor-pointer"
+              className="flex items-center gap-2 p-3 rounded-xl border border-purple-100 hover:border-purple-300 hover:bg-purple-50/30 transition cursor-pointer"
               onClick={() => navigate(`/profile/${m._id}`)}
             >
               <div className="w-12 h-12 rounded-xl bg-linear-to-br from-[#6C38FF] via-[#4C2AFF] to-[#EC38F5] text-white flex items-center justify-center text-xs font-bold shadow">
@@ -112,12 +118,21 @@ export default function PopularMembers() {
                 </div>
               </div>
 
-              <button 
-                onClick={(e) => handleEndorse(m._id, e)}
-                className="px-3 py-1.5 text-sm rounded-lg bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white shadow hover:opacity-90 transition whitespace-nowrap"
-              >
-                Endorse
-              </button>
+              <div className="flex flex-col gap-2">
+                <button 
+                  onClick={(e) => handleMessage(m._id, e)}
+                  className="p-2 rounded-lg bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors"
+                  title="Message"
+                >
+                  <MessageCircle size={18} />
+                </button>
+                <button 
+                  onClick={(e) => handleEndorse(m._id, e)}
+                  className="px-3 py-1.5 text-xs rounded-lg bg-linear-to-r from-[#7D4DF4] to-[#A589FD] text-white shadow hover:opacity-90 transition whitespace-nowrap"
+                >
+                  Endorse
+                </button>
+              </div>
             </div>
           ))}
         </div>

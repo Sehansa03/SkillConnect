@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import NavBar from "../../components/NavBar";
+import { useAuth } from "../../AuthContext";
 
 import {
   Star,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react"
 
 export default function ProfileViewerView() {
+  const { isAuthenticated, loading } = useAuth();
   const { userId } = useParams();
   const navigate = useNavigate();
   const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -19,8 +21,15 @@ export default function ProfileViewerView() {
   // --- State ---
   const [userData, setUserData] = useState(null);
   const [discussions, setDiscussions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [discussionsLoading, setDiscussionsLoading] = useState(true);
+
+  // Redirect to home if not authenticated or when user logs out
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate, loading]);
 
   useEffect(() => {
     if (userId) {
@@ -44,7 +53,7 @@ export default function ProfileViewerView() {
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   };
 
@@ -65,11 +74,8 @@ export default function ProfileViewerView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F3E8FF] to-white font-sans text-gray-800">
-        <NavBar />
-        <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Loading...</p>
       </div>
     );
   }
@@ -135,6 +141,12 @@ export default function ProfileViewerView() {
                     </div>
                     {userData.headline && (
                       <p className="text-base text-gray-900 font-medium mb-1">{userData.headline}</p>
+                    )}
+                    {userData.course && (
+                      <p className="text-sm text-gray-700 font-medium mb-1">
+                        📚 {userData.course}
+                        {userData.specialization && <span className="text-gray-500"> • {userData.specialization}</span>}
+                      </p>
                     )}
                     {userData.university && (
                       <p className="text-sm text-gray-500 font-medium">{userData.university}</p>
